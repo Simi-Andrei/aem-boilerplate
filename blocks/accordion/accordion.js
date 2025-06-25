@@ -4,7 +4,15 @@
  * https://www.hlx.live/developer/block-collection/accordion
  */
 
-export default function decorate(block) {
+export default async function decorate(block) {
+  const res = await fetch("/accordion-state.json");
+
+  const jsonRes = await res.json();
+
+  const accordionItemStates = jsonRes.data[0];
+
+  console.log(jsonRes.data);
+
   [...block.children].forEach((row) => {
     // decorate accordion item label
     const label = row.children[0];
@@ -19,5 +27,14 @@ export default function decorate(block) {
     details.className = "accordion-item";
     details.append(summary, body);
     row.replaceWith(details);
+
+    const setTooltip = () => {
+      summary.title = details.open
+        ? accordionItemStates.accordionItemClose
+        : accordionItemStates.accordionItemOpen;
+    };
+
+    setTooltip();
+    details.addEventListener("toggle", setTooltip);
   });
 }
